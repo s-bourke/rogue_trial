@@ -4,7 +4,6 @@ import attribs.Position;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import static java.lang.System.exit;
 
@@ -41,12 +40,11 @@ public class StandardMap {
 
         for (int i = 0; i < map.size(); i++) {
             if (i == y) {
-                System.out.println(map.get(i).substring(0, x) + 'p' + map.get(i).substring(x + 1, map.size() + 2));
+                System.out.println(map.get(i).substring(0, x) + 'p' + map.get(i).substring(x + 1, map.get(i).length()));
             } else {
                 System.out.println(map.get(i));
             }
         }
-
     }
 
     public String getBlock(Position pos, int[] move) {

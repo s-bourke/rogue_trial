@@ -7,7 +7,6 @@ import core.worldRefs;
 public class Player {
     private Position pos;
     private Health hp;
-
     public Player(Position pos, int hp) {
         this.pos = pos;
         this.hp = new Health(hp);
