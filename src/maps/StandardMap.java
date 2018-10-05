@@ -10,12 +10,12 @@ import static java.lang.System.exit;
 
 public class StandardMap {
 
-    ArrayList<String> map;
+    private ArrayList<String> map;
 
-    public StandardMap(String filepath) throws FileNotFoundException {
+    public StandardMap(String filepath){
 
 
-        map = new ArrayList<String>();
+        map = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
 
             String CurrentLine;
@@ -35,7 +35,7 @@ public class StandardMap {
         int x = player.getX();
         int y = player.getY();
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 25; i++) {
             System.out.println(" ");
         }
 
@@ -47,5 +47,9 @@ public class StandardMap {
             }
         }
 
+    }
+
+    public String getBlock(Position pos, int[] move) {
+        return map.get(pos.getY() + move[1]).substring(pos.getX() + move[0], pos.getX() + move[0] + 1);
     }
 }
