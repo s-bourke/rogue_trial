@@ -9,15 +9,14 @@ import maps.StandardMap;
 
 import static core.Direction.*;
 
-public class Player {
+public final class Player {
     private Position pos;
     private Health hp;
-    private Location loc;
+    public static Location loc = new Location(0,0);
 
-    public Player(int x, int y, int hp, int locX, int locY) {
+    public Player(int x, int y, int hp) {
         this.hp = new Health(hp);
         this.pos = new Position(x, y);
-        this.loc = new Location(locX, locY);
     }
 
 

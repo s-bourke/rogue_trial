@@ -4,6 +4,7 @@ import attribs.Location;
 import attribs.Position;
 import core.BlockRefs;
 import core.Direction;
+import entities.Player;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public class StandardMap {
                 newLoc = new Location(loc.getX() - 1, loc.getY());
                 break;
         }
-
+        Player.loc = newLoc;
         File f = new File(mapDir + filename);
         if (f.exists()) {
             if (filename != null) {
@@ -181,6 +182,10 @@ public class StandardMap {
                 break;
         }
         return -1;
+    }
+
+    public void addBlock(int i, int j, char c) {
+        map.set(i, (map.get(i).substring(0,j) + c + map.get(i).substring(j+1,BlockRefs.xSize)));
     }
 }
 

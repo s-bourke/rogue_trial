@@ -9,7 +9,7 @@ public class RogueTrial {
 
     public static void main(String[] args) {
 
-        Player player = new Player(BlockRefs.xSize/2, BlockRefs.ySize/2, 50, 0,0);
+        Player player = new Player(BlockRefs.xSize/2, BlockRefs.ySize/2, 50);
 
         MapGenerator.wipeMaps();
 
@@ -18,15 +18,16 @@ public class RogueTrial {
 
         Direction move;
 
+        currentMap.displayMap(player.getPos());
+
         while (true) {
-            currentMap.displayMap(player.getPos());
             move = UserInput.getMove();
             if (move != null) {
                 currentMap = player.move(currentMap, move);
+                currentMap.displayMap(player.getPos());
             }
         }
 
     }
 
 }
-
