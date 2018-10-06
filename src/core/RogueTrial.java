@@ -1,31 +1,32 @@
 package core;
 
 import entities.Player;
+import maps.MapGenerator;
 import maps.StandardMap;
-
-import java.util.concurrent.TimeUnit;
 
 
 public class RogueTrial {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
-        String mapDir = "preGenMaps";
-        String mapLoc = mapDir + "/Test1.map";
-        Player player = new Player(5, 5, 50);
+        Player player = new Player(BlockRefs.xSize/2, BlockRefs.ySize/2, 50, 0,0);
 
-        StandardMap testMap;
+        MapGenerator.wipeMaps();
 
-        testMap = new StandardMap(mapLoc);
+        StandardMap currentMap;
+        currentMap = MapGenerator.genStartingMap();
 
-        int[] move;
+        Direction move;
 
-        while(true) {
-            testMap.displayMap(player.getPos());
-            TimeUnit.SECONDS.sleep(1);
+        while (true) {
+            currentMap.displayMap(player.getPos());
             move = UserInput.getMove();
-            player.move(move[0], move[1], testMap.getBlock(player.getPos(), move));
+            if (move != null) {
+                currentMap = player.move(currentMap, move);
+            }
         }
 
     }
+
 }
+
