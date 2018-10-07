@@ -11,6 +11,7 @@ import java.awt.event.KeyListener;
 
 import static core.Direction.*;
 import static java.awt.event.KeyEvent.*;
+import static java.lang.System.exit;
 
 public class GameWindow extends JFrame {
 
@@ -48,6 +49,8 @@ public class GameWindow extends JFrame {
                     case VK_LEFT:
                         currentMap = player.move(currentMap,W);
                         break;
+                    case VK_Q:
+                        exit(0);
 
                 }
                 component.updateMap(currentMap);

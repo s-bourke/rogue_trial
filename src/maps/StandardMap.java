@@ -135,6 +135,14 @@ public class StandardMap {
             System.err.println("Failed to generate file name for existing map.");
             exit(4);
         }
+
+        int dir = (int) (Math.random() * (20));
+        switch (dir) {
+            case 0:
+                if (newLoc != null) {
+                    return MapGenerator.genBlockedMap(newLoc);
+                }
+        }
         return MapGenerator.genMap(newLoc);
     }
 
@@ -166,8 +174,8 @@ public class StandardMap {
         return -1;
     }
 
-    public void addBlock(int i, int j, char c) {
-        map.set(i, (map.get(i).substring(0,j) + c + map.get(i).substring(j+1,BlockRefs.xSize)));
+    public void addBlock(int x, int y, char c) {
+        map.set(y, (map.get(y).substring(0,x) + c + map.get(y).substring(x+1,BlockRefs.xSize)));
     }
 
     public ArrayList<String> getArray() {
