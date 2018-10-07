@@ -1,6 +1,5 @@
 package entities;
 
-import attribs.Health;
 import attribs.Location;
 import attribs.Position;
 import core.BlockRefs;
@@ -10,17 +9,15 @@ import maps.StandardMap;
 import static core.Direction.*;
 
 public final class Player {
-    private Position pos;
-    private Health hp;
+    private static Position pos;
     public static Location loc = new Location(0,0);
 
-    public Player(int x, int y, int hp) {
-        this.hp = new Health(hp);
-        this.pos = new Position(x, y);
+    public Player(int x, int y) {
+        pos = new Position(x, y);
     }
 
 
-    public Position getPos() {
+    public static Position getPos() {
         return pos;
     }
 

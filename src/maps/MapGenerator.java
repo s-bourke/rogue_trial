@@ -50,7 +50,7 @@ public final class MapGenerator {
 
         for (int i = 2; i < BlockRefs.ySize - 2; i++) {
             for (int j = 2; j < BlockRefs.xSize - 2; j++) {
-                if (Math.random() < 0.5) {
+                if (Math.random() < 0.3) {
                     nMap.addBlock(i, j, '@');
                 }
             }
@@ -81,34 +81,34 @@ public final class MapGenerator {
     private static StandardMap genBlankMap(Location loc) {
 
         ArrayList<String> mapLines = new ArrayList<String>();
-        StringBuilder horizBar = new StringBuilder();
+        StringBuilder hBar = new StringBuilder();
 
 
-        horizBar.append("/");
+        hBar.append("/");
         for (int i = 0; i < BlockRefs.xSize - 2; i++) {
-            horizBar.append("-");
+            hBar.append("-");
         }
-        horizBar.append("\\");
-        mapLines.add(horizBar.toString());
+        hBar.append("\\");
+        mapLines.add(hBar.toString());
 
         for (int i = 0; i < BlockRefs.ySize - 2; i++) {
-            horizBar = new StringBuilder();
-            horizBar.append("|");
+            hBar = new StringBuilder();
+            hBar.append("|");
             for (int j = 0; j < BlockRefs.xSize - 2; j++) {
-                horizBar.append(" ");
+                hBar.append(" ");
             }
-            horizBar.append("|");
-            mapLines.add(horizBar.toString());
+            hBar.append("|");
+            mapLines.add(hBar.toString());
         }
-        horizBar = new StringBuilder();
+        hBar = new StringBuilder();
 
 
-        horizBar.append("\\");
+        hBar.append("\\");
         for (int i = 0; i < BlockRefs.xSize - 2; i++) {
-            horizBar.append("-");
+            hBar.append("-");
         }
-        horizBar.append("/");
-        mapLines.add(horizBar.toString());
+        hBar.append("/");
+        mapLines.add(hBar.toString());
 
 
         return new StandardMap(mapLines, loc);
@@ -130,27 +130,14 @@ public final class MapGenerator {
         }
     }
 
-    public static void displayWorldMap() {
+    public static char[][] displayWorldMap() {
         File dir = new File(mapDir);
         File[] directoryListing = dir.listFiles();
-        int xMin = 0;
-        int xMax = 0;
-        int yMin = 0;
-        int yMax = 0;
         String[] parts;
 
-        if (directoryListing != null) {
-            for (File aDirectoryListing : directoryListing) {
-                parts = aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()).split("_");
-                xMin = Math.min(xMin, Integer.parseInt(parts[0]));
-                xMax = Math.max(xMax, Integer.parseInt(parts[0]));
-                yMin = Math.min(yMin, Integer.parseInt(parts[1]));
-                yMax = Math.max(yMax, Integer.parseInt(parts[1]));
-            }
-        }
+        int[] bounds = getBounds();
 
-
-        char[][] worldMap = new char[(Math.abs(yMin) + yMax) * 2 + 3][(Math.abs(xMin) + xMax) * 2 + 3];
+        char[][] worldMap = new char[(Math.abs(bounds[2]) + bounds[3]) * 2 + 3][(Math.abs(bounds[0]) + bounds[1]) * 2 + 3];
         for (char[] chars : worldMap) {
             Arrays.fill(chars, ' ');
         }
@@ -159,32 +146,47 @@ public final class MapGenerator {
         if (directoryListing != null) {
             for (File aDirectoryListing : directoryListing) {
                 parts = aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()).split("_");
-                worldMap[((Math.abs(yMin) + yMax) * 2) - ((Integer.parseInt(parts[1]) - yMin) * 2) + 1][(Integer.parseInt(parts[0]) - xMin) * 2 + 1] = 'x';
+                worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = 'x';
                 edgeCheck = new StandardMap(aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()));
                 if (edgeCheck.getOffset(N) != -1) {
-                    worldMap[((Math.abs(yMin) + yMax) * 2) - ((Integer.parseInt(parts[1]) - yMin) * 2)][(Integer.parseInt(parts[0]) - xMin) * 2 + 1] = '|';
+                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2)][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
                 }
                 if (edgeCheck.getOffset(S) != -1) {
-                    worldMap[((Math.abs(yMin) + yMax) * 2) - ((Integer.parseInt(parts[1]) - yMin) * 2) + 2][(Integer.parseInt(parts[0]) - xMin) * 2 + 1] = '|';
+                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 2][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
                 }
                 if (edgeCheck.getOffset(E) != -1) {
-                    worldMap[((Math.abs(yMin) + yMax) * 2) - ((Integer.parseInt(parts[1]) - yMin) * 2) + 1][(Integer.parseInt(parts[0]) - xMin) * 2 + 2] = '-';
+                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 2] = '-';
                 }
                 if (edgeCheck.getOffset(W) != -1) {
-                    worldMap[((Math.abs(yMin) + yMax) * 2) - ((Integer.parseInt(parts[1]) - yMin) * 2) + 1][(Integer.parseInt(parts[0]) - xMin) * 2] = '-';
+                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2] = '-';
                 }
             }
         }
+        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - (-bounds[2] * 2) + 1][ - bounds[0] * 2 + 1] = 's';
+        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Player.loc.getY() - bounds[2]) * 2) + 1][(Player.loc.getX() - bounds[0]) * 2 + 1] = 'p';
 
-        worldMap[((Math.abs(yMin) + yMax) * 2) - ((Player.loc.getY() - yMin) * 2) + 1][(Player.loc.getX() - xMin) * 2 + 1] = 'p';
+        return worldMap;
 
-        StringBuilder line;
-        for (char[] chars : worldMap) {
-            line = new StringBuilder();
-            for (char aChar : chars) {
-                line.append(aChar);
+    }
+
+    public static int[] getBounds(){
+
+        File dir = new File(mapDir);
+        File[] directoryListing = dir.listFiles();
+
+        int[] bounds = {0,0,0,0};
+        String[] parts;
+
+        if (directoryListing != null) {
+            for (File aDirectoryListing : directoryListing) {
+                parts = aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()).split("_");
+                bounds[0] = Math.min(bounds[0], Integer.parseInt(parts[0]));
+                bounds[1] = Math.max(bounds[1], Integer.parseInt(parts[0]));
+                bounds[2] = Math.min(bounds[2], Integer.parseInt(parts[1]));
+                bounds[3] = Math.max(bounds[3], Integer.parseInt(parts[1]));
             }
-            System.out.println(line);
         }
+
+        return bounds;
     }
 }

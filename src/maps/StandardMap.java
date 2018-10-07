@@ -14,8 +14,8 @@ import static java.lang.System.exit;
 
 public class StandardMap {
 
-    private ArrayList<String> map;
-    private Location loc;
+    private final ArrayList<String> map;
+    private final Location loc;
 
     public StandardMap(String filepath) {
 
@@ -45,24 +45,6 @@ public class StandardMap {
     public StandardMap(ArrayList<String> map, Location loc) {
         this.map = map;
         this.loc = loc;
-    }
-
-    public void displayMap(Position player) {
-
-        int x = player.getX();
-        int y = player.getY();
-
-        for (int i = 0; i < 2; i++) {
-            System.out.println(" ");
-        }
-        System.out.println(loc);
-        for (int i = 0; i < map.size(); i++) {
-            if (i == y) {
-                System.out.println(map.get(i).substring(0, x) + 'p' + map.get(i).substring(x + 1, map.get(i).length()));
-            } else {
-                System.out.println(map.get(i));
-            }
-        }
     }
 
     public String getBlock(Position pos, Direction move) {
@@ -186,6 +168,10 @@ public class StandardMap {
 
     public void addBlock(int i, int j, char c) {
         map.set(i, (map.get(i).substring(0,j) + c + map.get(i).substring(j+1,BlockRefs.xSize)));
+    }
+
+    public ArrayList<String> getArray() {
+        return map;
     }
 }
 
