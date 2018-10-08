@@ -41,22 +41,6 @@ public class Position {
             case W:
                 x-=1;
                 break;
-            case NE:
-                x+=1;
-                y-=1;
-                break;
-            case SE:
-                x+=1;
-                y+=1;
-                break;
-            case NW:
-                x-=1;
-                y-=1;
-                break;
-            case SW:
-                x-=1;
-                y+=1;
-                break;
         }
     }
 

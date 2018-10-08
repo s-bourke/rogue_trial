@@ -19,35 +19,19 @@ public final class MapGenerator {
     public static StandardMap genMap(Location loc) {
 
         StandardMap nMap = genBlankMap(loc);
-
         File f;
 
-        f = new File(mapDir + StandardMap.getFileName(loc.getX(), loc.getY() + 1));
-        if (f.exists()) {
-            nMap.addExit(N, getExit(StandardMap.getFileName(loc.getX(), loc.getY() + 1), S));
-        } else if (Math.random() < 0.65) {
-            nMap.addExit(N, (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
-        }
-
-        f = new File(mapDir + StandardMap.getFileName(loc.getX(), loc.getY() - 1));
-        if (f.exists()) {
-            nMap.addExit(S, getExit(StandardMap.getFileName(loc.getX(), loc.getY() - 1), N));
-        } else if (Math.random() < 0.65) {
-            nMap.addExit(S, (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
-        }
-
-        f = new File(mapDir + StandardMap.getFileName(loc.getX() + 1, loc.getY()));
-        if (f.exists()) {
-            nMap.addExit(E, getExit(StandardMap.getFileName(loc.getX() + 1, loc.getY()), W));
-        } else if (Math.random() < 0.65) {
-            nMap.addExit(E, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
-        }
-
-        f = new File(mapDir + StandardMap.getFileName(loc.getX() - 1, loc.getY()));
-        if (f.exists()) {
-            nMap.addExit(W, getExit(StandardMap.getFileName(loc.getX() - 1, loc.getY()), E));
-        } else if (Math.random() < 0.65) {
-            nMap.addExit(W, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
+        Direction[] dirs = {N, E, S, W};
+        int[] dirOffset = {0, 1, 0, -1};
+        int yIndex;
+        for (int i = 0; i < 4; i++) {
+            yIndex = (i + 1) % 4;
+            f = new File(mapDir + getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]));
+            if (f.exists()) {
+                nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
+            } else if (Math.random() < 0.65) {
+                nMap.addExit(dirs[i], (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
+            }
         }
 
         for (int i = 2; i < BlockRefs.ySize - 2; i++) {
@@ -59,30 +43,38 @@ public final class MapGenerator {
 
         }
 
-        nMap.writeMap(StandardMap.getFileName(loc.getX(), loc.getY()));
+        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
-    public static StandardMap genBlockedMap(Location loc) {
+    public static StandardMap genBlockedMap(Location loc, Direction arrivalDir) {
 
+        StandardMap nMap = genBlankMap(loc);
         File[] files = new File[4];
-        files[0] = new File(mapDir + StandardMap.getFileName(loc.getX(), loc.getY() + 1));
-        files[1] = new File(mapDir + StandardMap.getFileName(loc.getX(), loc.getY() - 1));
-        files[2] = new File(mapDir + StandardMap.getFileName(loc.getX() + 1, loc.getY()));
-        files[3] = new File(mapDir + StandardMap.getFileName(loc.getX() - 1, loc.getY()));
+        Direction[] dirs = {N, E, S, W};
+        int[] isAdj = {0, 0, 0, 0};
+        int[] isAdjExit = {0, 0, 0, 0};
+        int[] dirOffset = {0, 1, 0, -1};
+        int yIndex;
 
-
-        int[] isAdj = new int[4];
-
+        // Check if surrounding rooms exist.
+        System.out.println(" ");
         for (int i = 0; i < 4; i++) {
+            yIndex = (i + 1) % 4;
+            files[i] = new File(mapDir + getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]));
             if (files[i].exists()) {
                 isAdj[i] = 1;
+                if (getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]) != -1) {
+                    isAdjExit[i] = 1;
+                }
             }
         }
-        if (IntStream.of(isAdj).sum() != 1) {
+
+        if (IntStream.of(isAdj).sum() != IntStream.of(isAdjExit).sum()) {
             return genMap(loc);
         }
 
+        // Make sure there are at least two exits.
         while (IntStream.of(isAdj).sum() == 1) {
             for (int i = 0; i < 4; i++) {
                 if (Math.random() < 0.25) {
@@ -91,53 +83,26 @@ public final class MapGenerator {
             }
         }
 
-        StandardMap nMap;
-        nMap = genBlankMap(loc);
-
+        // Add exits.
         int[] offset = new int[4];
-        if (isAdj[0] == 1) {
-            if (files[0].exists()) {
-                offset[0] = getExit(StandardMap.getFileName(loc.getX(), loc.getY() + 1), S);
-                nMap.addExit(N, offset[0]);
-            } else {
-                offset[0] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
-                nMap.addExit(N, offset[0]);
-            }
-        }
-        if (isAdj[1] == 1) {
-            if (files[1].exists()) {
-                offset[1] = getExit(StandardMap.getFileName(loc.getX(), loc.getY() - 1), N);
-                nMap.addExit(S, offset[1]);
-            }else{
-                offset[1] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
-
-                nMap.addExit(S, offset[1]);
-            }
-        }
-        if (isAdj[2] == 1) {
-            if (files[2].exists()) {
-                offset[2] = getExit(StandardMap.getFileName(loc.getX() + 1, loc.getY()), W);
-                nMap.addExit(E, offset[2]);
-            }else{
-                offset[2] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
-
-                nMap.addExit(E, offset[2]);
-            }
-        }
-        if (isAdj[3] == 1) {
-            if (files[3].exists()) {
-                offset[3] = getExit(StandardMap.getFileName(loc.getX() - 1, loc.getY()), E);
-                nMap.addExit(W, offset[3]);
-            }else{
-                offset[3] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
-                nMap.addExit(W, offset[3]);
+        for (int i = 0; i < 4; i++) {
+            yIndex = (i + 1) % 4;
+            if (isAdj[i] == 1) {
+                if (files[i].exists()) {
+                    offset[i] = getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]);
+                    nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
+                } else {
+                    offset[i] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
+                    nMap.addExit(dirs[i], offset[i]);
+                }
             }
         }
 
         int dir;
         do {
             dir = (int) (Math.random() * 4);
-        } while (isAdj[dir] != 1);
+        } while (isAdj[dir] != 1 || dirs[dir] == arrivalDir);
+
         switch (dir) {
             case 0:
                 nMap.addBlock(offset[0] - 2, 1, '-');
@@ -149,21 +114,21 @@ public final class MapGenerator {
 
                 break;
             case 1:
-                nMap.addBlock(offset[1] - 2, BlockRefs.ySize - 2, '-');
-                nMap.addBlock(offset[1] - 1, BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[1], BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[1] + 1, BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[1] + 2, BlockRefs.ySize - 2, '-');
-                nMap.addBlock(offset[1], BlockRefs.ySize - 2, 'c');
-
+                nMap.addBlock(BlockRefs.xSize - 2, offset[1] - 2, '-');
+                nMap.addBlock(BlockRefs.xSize - 3, offset[1] - 1, '-');
+                nMap.addBlock(BlockRefs.xSize - 3, offset[1], '-');
+                nMap.addBlock(BlockRefs.xSize - 3, offset[1] + 1, '-');
+                nMap.addBlock(BlockRefs.xSize - 2, offset[1] + 2, '-');
+                nMap.addBlock(BlockRefs.xSize - 2, offset[1], 'c');
                 break;
             case 2:
-                nMap.addBlock(BlockRefs.xSize - 2, offset[2] - 2, '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[2] - 1, '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[2], '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[2] + 1, '-');
-                nMap.addBlock(BlockRefs.xSize - 2, offset[2] + 2, '-');
-                nMap.addBlock(BlockRefs.xSize - 2, offset[2], 'c');
+                nMap.addBlock(offset[2] - 2, BlockRefs.ySize - 2, '-');
+                nMap.addBlock(offset[2] - 1, BlockRefs.ySize - 3, '-');
+                nMap.addBlock(offset[2], BlockRefs.ySize - 3, '-');
+                nMap.addBlock(offset[2] + 1, BlockRefs.ySize - 3, '-');
+                nMap.addBlock(offset[2] + 2, BlockRefs.ySize - 2, '-');
+                nMap.addBlock(offset[2], BlockRefs.ySize - 2, 'c');
+
                 break;
             case 3:
                 nMap.addBlock(1, offset[3] - 2, '-');
@@ -176,7 +141,7 @@ public final class MapGenerator {
 
         }
 
-        nMap.writeMap(StandardMap.getFileName(loc.getX(), loc.getY()));
+        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
@@ -192,7 +157,7 @@ public final class MapGenerator {
         nMap.addExit(E, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
         nMap.addExit(W, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
 
-        nMap.writeMap(StandardMap.getFileName(0, 0));
+        nMap.writeMap(getFileName(0, 0));
 
         return nMap;
     }
@@ -311,11 +276,15 @@ public final class MapGenerator {
 
     public static void makeMapDir() {
         File directory = new File(mapDir);
-        if (! directory.exists()){
-            if (!directory.mkdir()){
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
                 System.err.println("Could not create " + mapDir + "directory.");
                 exit(5);
             }
         }
+    }
+
+    public static String getFileName(int x, int y) {
+        return x + "_" + y;
     }
 }

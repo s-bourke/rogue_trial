@@ -102,19 +102,19 @@ public class StandardMap {
         Location newLoc = null;
         switch (arrivalDir) {
             case S:
-                filename = getFileName(loc.getX(), loc.getY() + 1);
+                filename = MapGenerator.getFileName(loc.getX(), loc.getY() + 1);
                 newLoc = new Location(loc.getX(), loc.getY() + 1);
                 break;
             case N:
-                filename = getFileName(loc.getX(), loc.getY() - 1);
+                filename = MapGenerator.getFileName(loc.getX(), loc.getY() - 1);
                 newLoc = new Location(loc.getX(), loc.getY() - 1);
                 break;
             case W:
-                filename = getFileName(loc.getX() + 1, loc.getY());
+                filename = MapGenerator.getFileName(loc.getX() + 1, loc.getY());
                 newLoc = new Location(loc.getX() + 1, loc.getY());
                 break;
             case E:
-                filename = getFileName(loc.getX() - 1, loc.getY());
+                filename = MapGenerator.getFileName(loc.getX() - 1, loc.getY());
                 newLoc = new Location(loc.getX() - 1, loc.getY());
                 break;
         }
@@ -127,14 +127,12 @@ public class StandardMap {
         int dir = (int) (Math.random() * (20));
         switch (dir) {
             case 0:
-                return MapGenerator.genBlockedMap(newLoc);
+                return MapGenerator.genBlockedMap(newLoc, arrivalDir);
         }
         return MapGenerator.genMap(newLoc);
     }
 
-    public static String getFileName(int x, int y) {
-        return x + "_" + y;
-    }
+
 
     public int getOffset(Direction dir) {
         switch (dir) {
