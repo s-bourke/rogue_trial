@@ -11,9 +11,9 @@ public class RogueTrial {
     public static void main(String[] args) {
 
         MapGenerator.wipeMaps();
-
+        MapGenerator.makeMapDir();
         GameWindow game = new GameWindow();
-        game.getContentPane().setBackground( Color.BLACK );
+        game.getContentPane().setBackground(Color.BLACK);
         game.setVisible(true);
 
 
