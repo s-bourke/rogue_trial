@@ -57,14 +57,6 @@ public class StandardMap {
                 return map.get(pos.getY()).substring(pos.getX() + 1, pos.getX() + 2);
             case W:
                 return map.get(pos.getY()).substring(pos.getX() - 1, pos.getX());
-            case NE:
-                return map.get(pos.getY() - 1).substring(pos.getX() + 1, pos.getX() + 2);
-            case SE:
-                return map.get(pos.getY() + 1).substring(pos.getX() + 1, pos.getX() + 2);
-            case NW:
-                return map.get(pos.getY() - 1).substring(pos.getX() - 1, pos.getX());
-            case SW:
-                return map.get(pos.getY() + 1).substring(pos.getX() - 1, pos.getX());
         }
         return " ";
     }
@@ -73,10 +65,10 @@ public class StandardMap {
         if (offset != -1) {
             switch (dir) {
                 case N:
-                    map.set(0, (map.get(0).substring(0, offset) + ' ' + map.get(0).substring(offset + 1, map.get(0).length())));
+                    map.set(0, (map.get(0).substring(0, offset) + ' ' + map.get(0).substring(offset + 1)));
                     break;
                 case S:
-                    map.set(BlockRefs.ySize - 1, (map.get(BlockRefs.ySize - 1).substring(0, offset) + ' ' + map.get(BlockRefs.ySize - 1).substring(offset + 1, map.get(BlockRefs.ySize - 1).length())));
+                    map.set(BlockRefs.ySize - 1, (map.get(BlockRefs.ySize - 1).substring(0, offset) + ' ' + map.get(BlockRefs.ySize - 1).substring(offset + 1)));
                     break;
                 case E:
                     map.set(offset, (map.get(offset).substring(0, BlockRefs.xSize - 1) + ' '));
@@ -129,19 +121,13 @@ public class StandardMap {
         Player.loc = newLoc;
         File f = new File(mapDir + filename);
         if (f.exists()) {
-            if (filename != null) {
-                return new StandardMap(filename);
-            }
-            System.err.println("Failed to generate file name for existing map.");
-            exit(4);
+            return new StandardMap(filename);
         }
 
         int dir = (int) (Math.random() * (20));
         switch (dir) {
             case 0:
-                if (newLoc != null) {
-                    return MapGenerator.genBlockedMap(newLoc);
-                }
+                return MapGenerator.genBlockedMap(newLoc);
         }
         return MapGenerator.genMap(newLoc);
     }
@@ -175,7 +161,7 @@ public class StandardMap {
     }
 
     public void addBlock(int x, int y, char c) {
-        map.set(y, (map.get(y).substring(0,x) + c + map.get(y).substring(x+1,BlockRefs.xSize)));
+        map.set(y, (map.get(y).substring(0, x) + c + map.get(y).substring(x + 1, BlockRefs.xSize)));
     }
 
     public ArrayList<String> getArray() {

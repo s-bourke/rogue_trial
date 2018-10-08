@@ -25,25 +25,25 @@ public final class Player {
 
 
         if (pos.getY() == 0){
-            if (move == N || move == NE || move == NW){
+            if (move == N){
                 pos.setY(BlockRefs.ySize-1);
                 return map.getAdj(S);
             }
         }
         else if (pos.getY() == BlockRefs.ySize-1){
-            if (move == S || move == SE || move == SW){
+            if (move == S){
                 pos.setY(0);
                 return map.getAdj(N);
             }
         }
         else if (pos.getX() == 0){
-            if (move == W || move == SW || move == NW){
+            if (move == W){
                 pos.setX(BlockRefs.xSize-1);
                 return map.getAdj(E);
             }
         }
         else if (pos.getX() == BlockRefs.xSize-1){
-            if (move == E || move == NE || move == SE){
+            if (move == E){
                 pos.setX(0);
                 return map.getAdj(W);
             }

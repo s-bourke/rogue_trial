@@ -264,9 +264,9 @@ public final class MapGenerator {
 
         if (directoryListing != null) {
             for (File aDirectoryListing : directoryListing) {
-                parts = aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()).split("_");
+                parts = aDirectoryListing.toString().substring(mapDir.length()).split("_");
                 worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = 'x';
-                edgeCheck = new StandardMap(aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()));
+                edgeCheck = new StandardMap(aDirectoryListing.toString().substring(mapDir.length()));
                 if (edgeCheck.getOffset(N) != -1) {
                     worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2)][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
                 }
@@ -298,7 +298,7 @@ public final class MapGenerator {
 
         if (directoryListing != null) {
             for (File aDirectoryListing : directoryListing) {
-                parts = aDirectoryListing.toString().substring(mapDir.length(), aDirectoryListing.toString().length()).split("_");
+                parts = aDirectoryListing.toString().substring(mapDir.length()).split("_");
                 bounds[0] = Math.min(bounds[0], Integer.parseInt(parts[0]));
                 bounds[1] = Math.max(bounds[1], Integer.parseInt(parts[0]));
                 bounds[2] = Math.min(bounds[2], Integer.parseInt(parts[1]));
