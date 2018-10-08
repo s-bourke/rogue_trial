@@ -15,8 +15,8 @@ import static java.lang.System.exit;
 
 public class GameWindow extends JFrame {
 
-    public static final int DEFAULT_WIDTH = 800;
-    public static final int DEFAULT_HEIGHT = 800;
+    private static final int DEFAULT_WIDTH = 800;
+    private static final int DEFAULT_HEIGHT = 800;
     private MainMap component;
     private StandardMap currentMap;
     private Player player;

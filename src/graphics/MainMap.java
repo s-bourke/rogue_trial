@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainMap extends JComponent {
+class MainMap extends JComponent {
 
     private final Image[][] image;
     private Image room;

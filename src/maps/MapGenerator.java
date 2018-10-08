@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 
 import static core.BlockRefs.mapDir;
 import static core.Direction.*;
+import static java.lang.System.exit;
 
 public final class MapGenerator {
 
@@ -287,7 +288,7 @@ public final class MapGenerator {
 
     }
 
-    public static int[] getBounds() {
+    private static int[] getBounds() {
 
         File dir = new File(mapDir);
         File[] directoryListing = dir.listFiles();
@@ -311,7 +312,10 @@ public final class MapGenerator {
     public static void makeMapDir() {
         File directory = new File(mapDir);
         if (! directory.exists()){
-            directory.mkdir();
+            if (!directory.mkdir()){
+                System.err.println("Could not create " + mapDir + "directory.");
+                exit(5);
+            }
         }
     }
 }

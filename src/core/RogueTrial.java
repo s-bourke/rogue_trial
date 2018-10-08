@@ -6,7 +6,7 @@ import maps.MapGenerator;
 import java.awt.*;
 
 
-public class RogueTrial {
+class RogueTrial {
 
     public static void main(String[] args) {
 
