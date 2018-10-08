@@ -15,8 +15,8 @@ import static java.lang.System.exit;
 
 public class GameWindow extends JFrame {
 
-    private static final int DEFAULT_WIDTH = 800;
-    private static final int DEFAULT_HEIGHT = 800;
+    public static final int DEFAULT_WIDTH = 800;
+    public static final int DEFAULT_HEIGHT = 800;
     private MainMap component;
     private StandardMap currentMap;
     private Player player;
@@ -32,6 +32,7 @@ public class GameWindow extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                component.clearWorldMap();
                 switch (e.getKeyCode()) {
                     case VK_W:
                     case VK_UP:
@@ -48,6 +49,9 @@ public class GameWindow extends JFrame {
                     case VK_A:
                     case VK_LEFT:
                         currentMap = player.move(currentMap,W);
+                        break;
+                    case VK_M:
+                        component.displayWorldMap();
                         break;
                     case VK_Q:
                         exit(0);

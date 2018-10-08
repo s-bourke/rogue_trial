@@ -15,6 +15,7 @@ import java.util.ArrayList;
 class MainMap extends JComponent {
 
     private final Image[][] image;
+    private boolean worldMap;
     private Image room;
     private Image start;
     private Image connectionNS;
@@ -24,7 +25,7 @@ class MainMap extends JComponent {
     private Image mapBorder;
 
     public MainMap(StandardMap source) {
-
+        worldMap = false;
         image = new Image[BlockRefs.xSize][BlockRefs.ySize];
         try {
             room = ImageIO.read(new File("images/Room.png"));
@@ -79,75 +80,132 @@ class MainMap extends JComponent {
     }
 
     public void paintComponent(Graphics g) {
-        for (int i = 0; i < BlockRefs.xSize; i++) {
-            for (int j = 0; j < BlockRefs.ySize; j++) {
-                g.drawImage(image[i][j], i * 46 + 46, j * 46 + 46, this);
+        if (worldMap == false) {
+            for (int i = 0; i < BlockRefs.xSize; i++) {
+                for (int j = 0; j < BlockRefs.ySize; j++) {
+                    g.drawImage(image[i][j], i * 46 + 46, j * 46 + 46, this);
+                }
             }
-        }
 
-       char[][] miniMap = MapGenerator.displayWorldMap();
+            char[][] miniMap = MapGenerator.displayWorldMap();
 
-        int playerX = 0;
-        int playerY = 0;
+            int playerX = 0;
+            int playerY = 0;
 
-        for (int i = 0; i < miniMap.length; i++) {
-            for (int j = 0; j < miniMap[0].length; j++) {
-                if (miniMap[i][j] == 'p') {
-                    playerX = j;
-                    playerY = i;
-                    break;
+            for (int i = 0; i < miniMap.length; i++) {
+                for (int j = 0; j < miniMap[0].length; j++) {
+                    if (miniMap[i][j] == 'p') {
+                        playerX = j;
+                        playerY = i;
+                        break;
+                    }
+                }
+            }
+
+            int offsetX = 550 + 77 - 7 * playerX;
+            int offsetY = 50 + 77 - 7 * playerY;
+
+
+            int lowX = playerX - 10;
+            int highX = playerX + 10;
+
+            int lowY = playerY - 10;
+            int highY = playerY + 10;
+
+
+            lowX = Math.max(lowX, 0);
+            highX = Math.min(highX, miniMap[0].length);
+            lowY = Math.max(lowY, 0);
+            highY = Math.min(highY, miniMap.length);
+
+            for (int i = lowY; i < highY; i++) {
+                for (int j = lowX; j < highX; j++) {
+                    switch (miniMap[i][j]) {
+                        case 'x':
+                            g.drawImage(room, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case '-':
+                            g.drawImage(connectionEW, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case '|':
+                            g.drawImage(connectionNS, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case 'p':
+                            g.drawImage(playerIcon, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case 's':
+                            g.drawImage(start, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        default:
+                            g.drawImage(blank, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+
+                    }
+                }
+            }
+            for (int i = 0; i < 20; i++) {
+                g.drawImage(mapBorder, 557, (i + 4) * 7 + 29, this);
+                g.drawImage(mapBorder, 550 + 21 * 7, (i + 4) * 7 + 29, this);
+            }
+            for (int i = 0; i < 21; i++) {
+                g.drawImage(mapBorder, 557 + i * 7, 57, this);
+                g.drawImage(mapBorder, 557 + i * 7, 19 * 7 + 64, this);
+            }
+        } else{
+            char[][] miniMap = MapGenerator.displayWorldMap();
+
+            int playerX = 0;
+            int playerY = 0;
+
+            for (int i = 0; i < miniMap.length; i++) {
+                for (int j = 0; j < miniMap[0].length; j++) {
+                    if (miniMap[i][j] == 'p') {
+                        playerX = j;
+                        playerY = i;
+                        break;
+                    }
+                }
+            }
+
+            int offsetX = GameWindow.DEFAULT_WIDTH/2 - 7 * playerX;
+            int offsetY = GameWindow.DEFAULT_HEIGHT/2 - 7 * playerY;
+
+
+
+
+            for (int i = 0; i < miniMap.length; i++) {
+                for (int j = 0; j < miniMap[0].length; j++) {
+                    switch (miniMap[i][j]) {
+                        case 'x':
+                            g.drawImage(room, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case '-':
+                            g.drawImage(connectionEW, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case '|':
+                            g.drawImage(connectionNS, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case 'p':
+                            g.drawImage(playerIcon, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        case 's':
+                            g.drawImage(start, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+                        default:
+                            g.drawImage(blank, j * 7 + offsetX, i * 7 + offsetY, this);
+                            break;
+
+                    }
                 }
             }
         }
+    }
 
-        int offsetX = 550 + 77 - 7 * playerX;
-        int offsetY = 50 + 77 - 7 * playerY;
+    public void displayWorldMap() {
+        worldMap = true;
+    }
 
-
-        int lowX = playerX - 10;
-        int highX = playerX + 10;
-
-        int lowY = playerY - 10;
-        int highY = playerY + 10;
-
-
-        lowX = Math.max(lowX, 0);
-        highX = Math.min(highX, miniMap[0].length);
-        lowY = Math.max(lowY, 0);
-        highY = Math.min(highY, miniMap.length);
-
-        for (int i = lowY; i < highY; i++) {
-            for (int j = lowX; j < highX; j++) {
-                switch (miniMap[i][j]) {
-                    case 'x':
-                        g.drawImage(room, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-                    case '-':
-                        g.drawImage(connectionEW, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-                    case '|':
-                        g.drawImage(connectionNS, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-                    case 'p':
-                        g.drawImage(playerIcon, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-                    case 's':
-                        g.drawImage(start, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-                    default:
-                        g.drawImage(blank, j * 7 + offsetX, i * 7 + offsetY, this);
-                        break;
-
-                }
-            }
-        }
-        for (int i = 0; i < 20; i++) {
-            g.drawImage(mapBorder, 557, (i + 4) * 7 + 29, this);
-            g.drawImage(mapBorder, 550 + 21 * 7, (i + 4) * 7 + 29, this);
-        }
-        for (int i = 0; i < 21; i++) {
-            g.drawImage(mapBorder, 557 + i * 7, 57, this);
-            g.drawImage(mapBorder, 557 + i * 7, 19 * 7 + 64, this);
-        }
+    public void clearWorldMap() {
+        worldMap = false;
     }
 }
