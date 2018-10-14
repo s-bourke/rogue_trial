@@ -3,7 +3,7 @@ package graphics;
 import core.BlockRefs;
 import entities.Player;
 import maps.MapGenerator;
-import maps.StandardMap;
+import maps.Map;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -15,10 +15,10 @@ import static java.lang.System.exit;
 
 public class GameWindow extends JFrame {
 
-    public static final int DEFAULT_WIDTH = 800;
-    public static final int DEFAULT_HEIGHT = 800;
+    public static final int DEFAULT_WIDTH = 750;
+    public static final int DEFAULT_HEIGHT = 600;
     private MainMap component;
-    private StandardMap currentMap;
+    private Map currentMap;
     private Player player;
 
     public GameWindow() {
@@ -32,30 +32,31 @@ public class GameWindow extends JFrame {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                component.clearWorldMap();
-                switch (e.getKeyCode()) {
-                    case VK_W:
-                    case VK_UP:
-                        currentMap = player.move(currentMap,N);
-                        break;
-                    case VK_S:
-                    case VK_DOWN:
-                        currentMap = player.move(currentMap,S);
-                        break;
-                    case VK_D:
-                    case VK_RIGHT:
-                        currentMap = player.move(currentMap,E);
-                        break;
-                    case VK_A:
-                    case VK_LEFT:
-                        currentMap = player.move(currentMap,W);
-                        break;
-                    case VK_M:
-                        component.displayWorldMap();
-                        break;
-                    case VK_Q:
-                        exit(0);
+                if (component.clearWorldMap()) {
+                    switch (e.getKeyCode()) {
+                        case VK_W:
+                        case VK_UP:
+                            currentMap = player.move(currentMap, N);
+                            break;
+                        case VK_S:
+                        case VK_DOWN:
+                            currentMap = player.move(currentMap, S);
+                            break;
+                        case VK_D:
+                        case VK_RIGHT:
+                            currentMap = player.move(currentMap, E);
+                            break;
+                        case VK_A:
+                        case VK_LEFT:
+                            currentMap = player.move(currentMap, W);
+                            break;
+                        case VK_M:
+                            component.displayWorldMap();
+                            break;
+                        case VK_Q:
+                            exit(0);
 
+                    }
                 }
                 component.updateMap(currentMap);
                 repaint();
@@ -66,12 +67,14 @@ public class GameWindow extends JFrame {
             }
         };
 
-        player = new Player(BlockRefs.xSize / 2, BlockRefs.ySize / 2);
+        player = new Player(BlockRefs.size / 2, BlockRefs.size / 2);
 
         currentMap = MapGenerator.genStartingMap();
 
         component = new MainMap(currentMap);
+
         add(component);
+
         addKeyListener(listener);
 
     }
