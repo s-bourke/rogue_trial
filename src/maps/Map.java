@@ -1,7 +1,6 @@
 package maps;
 
 import attribs.Location;
-import attribs.Position;
 import core.Direction;
 import core.RoomType;
 import entities.Player;
@@ -11,9 +10,7 @@ import java.util.ArrayList;
 
 import static core.BlockRefs.mapDir;
 import static core.BlockRefs.size;
-import static core.RoomType.Enemy;
-import static core.RoomType.Start;
-import static core.RoomType.Treasure;
+import static core.RoomType.*;
 import static java.lang.System.exit;
 
 public class Map {
@@ -59,10 +56,12 @@ public class Map {
         if (!types.contains(type)) {
             types.add(type);
         }
+        writeMap(MapGenerator.getFileName(loc.getX(), loc.getY()));
     }
 
     public void removeType(RoomType type) {
         types.remove(type);
+        writeMap(MapGenerator.getFileName(loc.getX(), loc.getY()));
     }
 
     public static RoomType getTypeFromSymbol(char s) {
@@ -73,6 +72,8 @@ public class Map {
                 return Start;
             case 'T':
                 return Treasure;
+            case 'H':
+                return Hidden;
             default:
                 return null;
         }
@@ -86,6 +87,8 @@ public class Map {
                 return 'S';
             case Treasure:
                 return 'T';
+            case Hidden:
+                return 'H';
             default:
                 return ' ';
         }
@@ -97,7 +100,7 @@ public class Map {
         types = new ArrayList<>();
     }
 
-    public char getBlock(Position pos, Direction move) {
+    public char getBlock(Location pos, Direction move) {
         switch (move) {
             case N:
                 return map[pos.getY() - 1][pos.getX()];
@@ -111,7 +114,7 @@ public class Map {
         return ' ';
     }
 
-    public void removeBlock(Position pos, Direction move) {
+    public void removeBlock(Location pos, Direction move) {
         switch (move) {
             case N:
                 map[pos.getY() - 1][pos.getX()] = ' ';
@@ -199,7 +202,10 @@ public class Map {
         Player.loc = newLoc;
         File f = new File(mapDir + filename);
         if (f.exists()) {
-            return new Map(filename);
+            Map oldMap = new Map(filename);
+            oldMap.removeType(Hidden);
+            return oldMap;
+
         }
 
         int dir = (int) (Math.random() * (20));
@@ -236,7 +242,7 @@ public class Map {
     }
 
     public void addBlock(int x, int y, char c) {
-        map[x][y] = c;
+        map[y][x] = c;
     }
 
     public char[][] getArray() {
@@ -255,5 +261,12 @@ public class Map {
 
     }
 
+    public int getLocX() {
+        return loc.getX();
+    }
+
+    public int getLocY() {
+        return loc.getY();
+    }
 }
 

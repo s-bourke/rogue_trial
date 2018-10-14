@@ -190,6 +190,7 @@ class MainMap extends JComponent {
                 return playerIcon;
             case 's':
                 return start;
+            case 'h':
             default:
                 return blank;
         }

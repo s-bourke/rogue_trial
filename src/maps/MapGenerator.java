@@ -23,6 +23,8 @@ public final class MapGenerator {
 
     public static Map genMap(Location loc) {
 
+        System.out.println("Generating standard map at " + loc);
+
         Map nMap = genBlankMap(loc);
         File f;
 
@@ -51,7 +53,44 @@ public final class MapGenerator {
         return nMap;
     }
 
+    private static Map genHighAccessMap(Location loc) {
+
+        System.out.println("Generating high access map at " + loc);
+
+        Map nMap = genBlankMap(loc);
+        File f;
+
+        Direction[] dirs = {N, E, S, W};
+        int[] dirOffset = {0, 1, 0, -1};
+        int yIndex;
+        int offset;
+        for (int i = 0; i < 4; i++) {
+            yIndex = (i + 1) % 4;
+            f = new File(mapDir + getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]));
+            if (f.exists()) {
+                nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
+            } else {
+                offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
+                nMap.addExit(dirs[i], offset);
+            }
+        }
+
+        for (int i = 2; i < BlockRefs.size - 2; i++) {
+            for (int j = 2; j < BlockRefs.size - 2; j++) {
+                if (Math.random() < 0.3) {
+                    nMap.addBlock(i, j, '@');
+                }
+            }
+        }
+
+        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
+        return nMap;
+    }
+
+
     public static Map genBlockedMap(Location loc, Direction arrivalDir) {
+
+        System.out.println("Generating blocked map at " + loc);
 
         Map nMap = genBlankMap(loc);
         File[] files = new File[4];
@@ -74,13 +113,14 @@ public final class MapGenerator {
         }
 
         if (IntStream.of(isAdj).sum() != IntStream.of(isAdjExit).sum()) {
+            System.out.println("Failed to generate blocked map");
             return genMap(loc);
         }
 
         // Make sure there are at least two exits.
         while (IntStream.of(isAdj).sum() == 1) {
             for (int i = 0; i < 4; i++) {
-                if (Math.random() < 0.25) {
+                if (Math.random() < 0.7) {
                     isAdj[i] = 1;
                 }
             }
@@ -88,12 +128,13 @@ public final class MapGenerator {
 
         // Add exits.
         int[] offset = new int[4];
+
         for (int i = 0; i < 4; i++) {
             yIndex = (i + 1) % 4;
             if (isAdj[i] == 1) {
                 if (files[i].exists()) {
                     offset[i] = getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]);
-                    nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
+                    nMap.addExit(dirs[i], offset[i]);
                 } else {
                     offset[i] = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
                     nMap.addExit(dirs[i], offset[i]);
@@ -105,46 +146,52 @@ public final class MapGenerator {
         do {
             dir = (int) (Math.random() * 4);
         } while (isAdj[dir] != 1 || dirs[dir] == arrivalDir);
-
+        Map hidden = null;
+        nMap.addType(RoomType.Treasure);
+        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         switch (dir) {
             case 0:
-                nMap.addBlock(offset[0] - 2, 1, '-');
-                nMap.addBlock(offset[0] - 1, 2, '-');
-                nMap.addBlock(offset[0], 2, '-');
-                nMap.addBlock(offset[0] + 1, 2, '-');
-                nMap.addBlock(offset[0] + 2, 1, '-');
-                nMap.addBlock(offset[0], 1, 'c');
+                nMap.addBlock(offset[dir] - 2, 1, '-');
+                nMap.addBlock(offset[dir] - 1, 2, '-');
+                nMap.addBlock(offset[dir], 2, '-');
+                nMap.addBlock(offset[dir] + 1, 2, '-');
+                nMap.addBlock(offset[dir] + 2, 1, '-');
+                nMap.addBlock(offset[dir], 1, 'c');
+                hidden = genHighAccessMap(loc.adjLocation(N));
 
                 break;
             case 1:
-                nMap.addBlock(BlockRefs.size - 2, offset[1] - 2, '-');
-                nMap.addBlock(BlockRefs.size - 3, offset[1] - 1, '-');
-                nMap.addBlock(BlockRefs.size - 3, offset[1], '-');
-                nMap.addBlock(BlockRefs.size - 3, offset[1] + 1, '-');
-                nMap.addBlock(BlockRefs.size - 2, offset[1] + 2, '-');
-                nMap.addBlock(BlockRefs.size - 2, offset[1], 'c');
+                nMap.addBlock(BlockRefs.size - 2, offset[dir] - 2, '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[dir] - 1, '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[dir], '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[dir] + 1, '-');
+                nMap.addBlock(BlockRefs.size - 2, offset[dir] + 2, '-');
+                nMap.addBlock(BlockRefs.size - 2, offset[dir], 'c');
+                hidden = genHighAccessMap(loc.adjLocation(E));
                 break;
             case 2:
-                nMap.addBlock(offset[2] - 2, BlockRefs.size - 2, '-');
-                nMap.addBlock(offset[2] - 1, BlockRefs.size - 3, '-');
-                nMap.addBlock(offset[2], BlockRefs.size - 3, '-');
-                nMap.addBlock(offset[2] + 1, BlockRefs.size - 3, '-');
-                nMap.addBlock(offset[2] + 2, BlockRefs.size - 2, '-');
-                nMap.addBlock(offset[2], BlockRefs.size - 2, 'c');
-
+                nMap.addBlock(offset[dir] - 2, BlockRefs.size - 2, '-');
+                nMap.addBlock(offset[dir] - 1, BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[dir], BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[dir] + 1, BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[dir] + 2, BlockRefs.size - 2, '-');
+                nMap.addBlock(offset[dir], BlockRefs.size - 2, 'c');
+                hidden = genHighAccessMap(loc.adjLocation(S));
                 break;
             case 3:
-                nMap.addBlock(1, offset[3] - 2, '-');
-                nMap.addBlock(2, offset[3] - 1, '-');
-                nMap.addBlock(2, offset[3], '-');
-                nMap.addBlock(2, offset[3] + 1, '-');
-                nMap.addBlock(1, offset[3] + 2, '-');
-                nMap.addBlock(1, offset[3], 'c');
+                nMap.addBlock(1, offset[dir] - 2, '-');
+                nMap.addBlock(2, offset[dir] - 1, '-');
+                nMap.addBlock(2, offset[dir], '-');
+                nMap.addBlock(2, offset[dir] + 1, '-');
+                nMap.addBlock(1, offset[dir] + 2, '-');
+                nMap.addBlock(1, offset[dir], 'c');
+                hidden = genHighAccessMap(loc.adjLocation(W));
                 break;
 
         }
-        nMap.addType(RoomType.Treasure);
+        hidden.addType(RoomType.Hidden);
         nMap.writeMap(getFileName(loc.getX(), loc.getY()));
+
         return nMap;
     }
 
@@ -153,6 +200,7 @@ public final class MapGenerator {
     }
 
     public static Map genStartingMap() {
+        System.out.println("Generating starting map");
         Map nMap = genBlankMap(new Location(0, 0));
         int offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
         nMap.addExit(N, offset);
@@ -180,9 +228,9 @@ public final class MapGenerator {
 
         for (int i = 0; i < size; i++) {
             map[i][0] = '-';
-            map[i][size-1] = '-';
+            map[i][size - 1] = '-';
             map[0][i] = '-';
-            map[size-1][i] = '-';
+            map[size - 1][i] = '-';
         }
 
         return new Map(map, loc);
@@ -196,9 +244,9 @@ public final class MapGenerator {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 if (child.delete()) {
-                    System.out.println("File '" + child + "' deleted successfully.");
+                    System.out.println("File '" + child + "' deleted successfully");
                 } else {
-                    System.out.println("Failed to delete the file.");
+                    System.out.println("Failed to delete the file: " + child);
                 }
             }
         }
@@ -221,18 +269,20 @@ public final class MapGenerator {
             for (File aDirectoryListing : directoryListing) {
                 parts = aDirectoryListing.toString().substring(mapDir.length()).split("_");
                 worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = getRoomCode(aDirectoryListing);
-                edgeCheck = new Map(aDirectoryListing.toString().substring(mapDir.length()));
-                if (edgeCheck.getOffset(N) != -1) {
-                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2)][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
-                }
-                if (edgeCheck.getOffset(S) != -1) {
-                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 2][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
-                }
-                if (edgeCheck.getOffset(E) != -1) {
-                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 2] = '-';
-                }
-                if (edgeCheck.getOffset(W) != -1) {
-                    worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2] = '-';
+                if (worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] != 'h') {
+                    edgeCheck = new Map(aDirectoryListing.toString().substring(mapDir.length()));
+                    if (edgeCheck.getOffset(N) != -1) {
+                        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2)][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
+                    }
+                    if (edgeCheck.getOffset(S) != -1) {
+                        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 2][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
+                    }
+                    if (edgeCheck.getOffset(E) != -1) {
+                        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 2] = '-';
+                    }
+                    if (edgeCheck.getOffset(W) != -1) {
+                        worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2] = '-';
+                    }
                 }
             }
         }
@@ -258,8 +308,15 @@ public final class MapGenerator {
             exit(2);
         }
 
-        if (types.contains(RoomType.Start)){ return 's';}
-        if (types.contains(RoomType.Treasure)){ return 't';}
+        if (types.contains(RoomType.Hidden)) {
+            return 'h';
+        }
+        if (types.contains(RoomType.Start)) {
+            return 's';
+        }
+        if (types.contains(RoomType.Treasure)) {
+            return 't';
+        }
 
         return 'x';
     }
