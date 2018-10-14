@@ -3,22 +3,27 @@ package maps;
 import attribs.Location;
 import core.BlockRefs;
 import core.Direction;
+import core.RoomType;
 import entities.Player;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static core.BlockRefs.mapDir;
+import static core.BlockRefs.size;
 import static core.Direction.*;
 import static java.lang.System.exit;
 
 public final class MapGenerator {
 
-    public static StandardMap genMap(Location loc) {
+    public static Map genMap(Location loc) {
 
-        StandardMap nMap = genBlankMap(loc);
+        Map nMap = genBlankMap(loc);
         File f;
 
         Direction[] dirs = {N, E, S, W};
@@ -29,27 +34,26 @@ public final class MapGenerator {
             f = new File(mapDir + getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]));
             if (f.exists()) {
                 nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
-            } else if (Math.random() < 0.65) {
-                nMap.addExit(dirs[i], (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
+            } else if (Math.random() < 0.6) {
+                nMap.addExit(dirs[i], (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2)));
             }
         }
 
-        for (int i = 2; i < BlockRefs.ySize - 2; i++) {
-            for (int j = 2; j < BlockRefs.xSize - 2; j++) {
+        for (int i = 2; i < BlockRefs.size - 2; i++) {
+            for (int j = 2; j < BlockRefs.size - 2; j++) {
                 if (Math.random() < 0.3) {
                     nMap.addBlock(i, j, '@');
                 }
             }
-
         }
 
         nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
-    public static StandardMap genBlockedMap(Location loc, Direction arrivalDir) {
+    public static Map genBlockedMap(Location loc, Direction arrivalDir) {
 
-        StandardMap nMap = genBlankMap(loc);
+        Map nMap = genBlankMap(loc);
         File[] files = new File[4];
         Direction[] dirs = {N, E, S, W};
         int[] isAdj = {0, 0, 0, 0};
@@ -58,7 +62,6 @@ public final class MapGenerator {
         int yIndex;
 
         // Check if surrounding rooms exist.
-        System.out.println(" ");
         for (int i = 0; i < 4; i++) {
             yIndex = (i + 1) % 4;
             files[i] = new File(mapDir + getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]));
@@ -92,7 +95,7 @@ public final class MapGenerator {
                     offset[i] = getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]);
                     nMap.addExit(dirs[i], getExit(getFileName(loc.getX() + dirOffset[i], loc.getY() + dirOffset[yIndex]), dirs[(i + 2) % 4]));
                 } else {
-                    offset[i] = (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2));
+                    offset[i] = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
                     nMap.addExit(dirs[i], offset[i]);
                 }
             }
@@ -114,20 +117,20 @@ public final class MapGenerator {
 
                 break;
             case 1:
-                nMap.addBlock(BlockRefs.xSize - 2, offset[1] - 2, '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[1] - 1, '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[1], '-');
-                nMap.addBlock(BlockRefs.xSize - 3, offset[1] + 1, '-');
-                nMap.addBlock(BlockRefs.xSize - 2, offset[1] + 2, '-');
-                nMap.addBlock(BlockRefs.xSize - 2, offset[1], 'c');
+                nMap.addBlock(BlockRefs.size - 2, offset[1] - 2, '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[1] - 1, '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[1], '-');
+                nMap.addBlock(BlockRefs.size - 3, offset[1] + 1, '-');
+                nMap.addBlock(BlockRefs.size - 2, offset[1] + 2, '-');
+                nMap.addBlock(BlockRefs.size - 2, offset[1], 'c');
                 break;
             case 2:
-                nMap.addBlock(offset[2] - 2, BlockRefs.ySize - 2, '-');
-                nMap.addBlock(offset[2] - 1, BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[2], BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[2] + 1, BlockRefs.ySize - 3, '-');
-                nMap.addBlock(offset[2] + 2, BlockRefs.ySize - 2, '-');
-                nMap.addBlock(offset[2], BlockRefs.ySize - 2, 'c');
+                nMap.addBlock(offset[2] - 2, BlockRefs.size - 2, '-');
+                nMap.addBlock(offset[2] - 1, BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[2], BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[2] + 1, BlockRefs.size - 3, '-');
+                nMap.addBlock(offset[2] + 2, BlockRefs.size - 2, '-');
+                nMap.addBlock(offset[2], BlockRefs.size - 2, 'c');
 
                 break;
             case 3:
@@ -140,62 +143,49 @@ public final class MapGenerator {
                 break;
 
         }
-
+        nMap.addType(RoomType.Treasure);
         nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
     private static int getExit(String f, Direction dir) {
-        return new StandardMap(f).getOffset(dir);
+        return new Map(f).getOffset(dir);
     }
 
-    public static StandardMap genStartingMap() {
-        StandardMap nMap = genBlankMap(new Location(0, 0));
-
-        nMap.addExit(N, (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
-        nMap.addExit(S, (BlockRefs.xSize / 4) + (int) (Math.random() * (BlockRefs.xSize / 2)));
-        nMap.addExit(E, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
-        nMap.addExit(W, (BlockRefs.ySize / 4) + (int) (Math.random() * (BlockRefs.ySize / 2)));
-
+    public static Map genStartingMap() {
+        Map nMap = genBlankMap(new Location(0, 0));
+        int offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
+        nMap.addExit(N, offset);
+        offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
+        nMap.addExit(S, offset);
+        offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
+        nMap.addExit(E, offset);
+        offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
+        nMap.addExit(W, offset);
+        nMap.addType(RoomType.Start);
         nMap.writeMap(getFileName(0, 0));
 
         return nMap;
     }
 
-    private static StandardMap genBlankMap(Location loc) {
+    private static Map genBlankMap(Location loc) {
 
-        ArrayList<String> mapLines = new ArrayList<String>();
-        StringBuilder hBar = new StringBuilder();
+        char[][] map = new char[size][size];
 
-
-        hBar.append("/");
-        for (int i = 0; i < BlockRefs.xSize - 2; i++) {
-            hBar.append("-");
-        }
-        hBar.append("\\");
-        mapLines.add(hBar.toString());
-
-        for (int i = 0; i < BlockRefs.ySize - 2; i++) {
-            hBar = new StringBuilder();
-            hBar.append("|");
-            for (int j = 0; j < BlockRefs.xSize - 2; j++) {
-                hBar.append(" ");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                map[i][j] = ' ';
             }
-            hBar.append("|");
-            mapLines.add(hBar.toString());
         }
-        hBar = new StringBuilder();
 
-
-        hBar.append("\\");
-        for (int i = 0; i < BlockRefs.xSize - 2; i++) {
-            hBar.append("-");
+        for (int i = 0; i < size; i++) {
+            map[i][0] = '-';
+            map[i][size-1] = '-';
+            map[0][i] = '-';
+            map[size-1][i] = '-';
         }
-        hBar.append("/");
-        mapLines.add(hBar.toString());
 
-
-        return new StandardMap(mapLines, loc);
+        return new Map(map, loc);
 
     }
 
@@ -214,7 +204,7 @@ public final class MapGenerator {
         }
     }
 
-    public static char[][] displayWorldMap() {
+    public static char[][] buildWorldMap() {
         File dir = new File(mapDir);
         File[] directoryListing = dir.listFiles();
         String[] parts;
@@ -225,13 +215,13 @@ public final class MapGenerator {
         for (char[] chars : worldMap) {
             Arrays.fill(chars, ' ');
         }
-        StandardMap edgeCheck;
+        Map edgeCheck;
 
         if (directoryListing != null) {
             for (File aDirectoryListing : directoryListing) {
                 parts = aDirectoryListing.toString().substring(mapDir.length()).split("_");
-                worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = 'x';
-                edgeCheck = new StandardMap(aDirectoryListing.toString().substring(mapDir.length()));
+                worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2) + 1][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = getRoomCode(aDirectoryListing);
+                edgeCheck = new Map(aDirectoryListing.toString().substring(mapDir.length()));
                 if (edgeCheck.getOffset(N) != -1) {
                     worldMap[((Math.abs(bounds[2]) + bounds[3]) * 2) - ((Integer.parseInt(parts[1]) - bounds[2]) * 2)][(Integer.parseInt(parts[0]) - bounds[0]) * 2 + 1] = '|';
                 }
@@ -251,6 +241,27 @@ public final class MapGenerator {
 
         return worldMap;
 
+    }
+
+    private static char getRoomCode(File aDirectoryListing) {
+
+        ArrayList<RoomType> types = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(aDirectoryListing))) {
+
+            for (char s : br.readLine().toCharArray()) {
+                types.add(Map.getTypeFromSymbol(s));
+            }
+
+        } catch (IOException e) {
+            System.err.println("Missing map file: " + aDirectoryListing);
+            exit(2);
+        }
+
+        if (types.contains(RoomType.Start)){ return 's';}
+        if (types.contains(RoomType.Treasure)){ return 't';}
+
+        return 'x';
     }
 
     private static int[] getBounds() {
