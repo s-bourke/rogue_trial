@@ -4,6 +4,7 @@ import attribs.Location;
 import core.Direction;
 import core.RoomType;
 import entities.Player;
+import paths.PathFinding;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import static core.BlockRefs.mapDir;
 import static core.BlockRefs.size;
 import static core.RoomType.*;
 import static java.lang.System.exit;
+import static maps.MapGenerator.getFileName;
 
 public class Map {
 
@@ -56,12 +58,12 @@ public class Map {
         if (!types.contains(type)) {
             types.add(type);
         }
-        writeMap(MapGenerator.getFileName(loc.getX(), loc.getY()));
+        writeMap(getFileName(loc.getX(), loc.getY()));
     }
 
     public void removeType(RoomType type) {
         types.remove(type);
-        writeMap(MapGenerator.getFileName(loc.getX(), loc.getY()));
+        writeMap(getFileName(loc.getX(), loc.getY()));
     }
 
     public static RoomType getTypeFromSymbol(char s) {
@@ -112,6 +114,10 @@ public class Map {
                 return map[pos.getY()][pos.getX() - 1];
         }
         return ' ';
+    }
+
+    public char getBlock(int x, int y) {
+        return map[y][x];
     }
 
     public void removeBlock(Location pos, Direction move) {
@@ -183,19 +189,19 @@ public class Map {
         Location newLoc = null;
         switch (arrivalDir) {
             case S:
-                filename = MapGenerator.getFileName(loc.getX(), loc.getY() + 1);
+                filename = getFileName(loc.getX(), loc.getY() + 1);
                 newLoc = new Location(loc.getX(), loc.getY() + 1);
                 break;
             case N:
-                filename = MapGenerator.getFileName(loc.getX(), loc.getY() - 1);
+                filename = getFileName(loc.getX(), loc.getY() - 1);
                 newLoc = new Location(loc.getX(), loc.getY() - 1);
                 break;
             case W:
-                filename = MapGenerator.getFileName(loc.getX() + 1, loc.getY());
+                filename = getFileName(loc.getX() + 1, loc.getY());
                 newLoc = new Location(loc.getX() + 1, loc.getY());
                 break;
             case E:
-                filename = MapGenerator.getFileName(loc.getX() - 1, loc.getY());
+                filename = getFileName(loc.getX() - 1, loc.getY());
                 newLoc = new Location(loc.getX() - 1, loc.getY());
                 break;
         }
@@ -267,6 +273,26 @@ public class Map {
 
     public int getLocY() {
         return loc.getY();
+    }
+
+    public void moveEnemies() {
+        ArrayList<Location> enemies = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (map[j][i] == 'e') {
+                    enemies.add(new Location(i, j));
+                }
+            }
+        }
+
+        Location movePos;
+        for (Location enemy : enemies) {
+            movePos = PathFinding.getPath(this, enemy, Player.getPos());
+            map[movePos.getY()][movePos.getX()] = 'e';
+            map[enemy.getY()][enemy.getX()] = ' ';
+        }
+        writeMap(getFileName(loc.getX(), loc.getY()));
     }
 }
 

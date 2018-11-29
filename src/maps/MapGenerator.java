@@ -49,7 +49,14 @@ public final class MapGenerator {
             }
         }
 
-        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
+        if (Math.random() < 0.3) {
+            int x =(int)(Math.random() * (size-6))+3;
+            int y =(int)(Math.random() * (size-6))+3;
+            System.out.println(x + " " + y);
+            nMap.addBlock(x,y, 'e');
+        }
+
+            nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
@@ -210,6 +217,7 @@ public final class MapGenerator {
         nMap.addExit(E, offset);
         offset = (BlockRefs.size / 4) + (int) (Math.random() * (BlockRefs.size / 2));
         nMap.addExit(W, offset);
+        nMap.addBlock(3, 3, 'e');
         nMap.addType(RoomType.Start);
         nMap.writeMap(getFileName(0, 0));
 

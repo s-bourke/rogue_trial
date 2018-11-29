@@ -50,6 +50,7 @@ class MainMap extends JComponent {
         File bush = new File("images/Bush.png");
         File player = new File("images/Player.png");
         File chest = new File("images/Chest.png");
+        File enemy = new File("images/Enemy.png");
 
         try {
             for (int i = 0; i < BlockRefs.size; i++) {
@@ -69,6 +70,9 @@ class MainMap extends JComponent {
                             break;
                         case 'c':
                             image[i][j] = ImageIO.read(chest);
+                            break;
+                        case 'e':
+                            image[i][j] = ImageIO.read(enemy);
                             break;
                     }
                 }

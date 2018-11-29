@@ -6,8 +6,13 @@ import core.Direction;
 import core.RoomType;
 import maps.Map;
 import maps.MapGenerator;
+import paths.PathFinding;
+
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 
 import static core.Direction.*;
+import static java.lang.System.exit;
 import static maps.Map.getSymbolFromType;
 
 public final class Player {
@@ -21,6 +26,13 @@ public final class Player {
 
     public static Location getPos() {
         return pos;
+    }
+
+    public static void checkDeath(Map map) {
+        if (map.getBlock(pos.getX(),pos.getY()) == 'e'){
+            System.out.println("You got caught by a monster!!!");
+            exit(0);
+        }
     }
 
     public Map move(Map map, Direction move) {
@@ -43,6 +55,7 @@ public final class Player {
             return map.getAdj(E);
         }
 
+
         if (!BlockRefs.worldBlocks.contains(String.valueOf(map.getBlock(pos, move)))) {
             if (map.getBlock(pos, move) == 'c') {
                 map.removeBlock(pos, move);
@@ -52,6 +65,7 @@ public final class Player {
             }
             pos.move(move);
         }
+
         return map;
     }
 

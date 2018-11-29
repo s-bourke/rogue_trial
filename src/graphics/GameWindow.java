@@ -37,18 +37,26 @@ public class GameWindow extends JFrame {
                         case VK_W:
                         case VK_UP:
                             currentMap = player.move(currentMap, N);
+                            currentMap.moveEnemies();
+                            Player.checkDeath(currentMap);
                             break;
                         case VK_S:
                         case VK_DOWN:
                             currentMap = player.move(currentMap, S);
+                            currentMap.moveEnemies();
+                            Player.checkDeath(currentMap);
                             break;
                         case VK_D:
                         case VK_RIGHT:
                             currentMap = player.move(currentMap, E);
+                            currentMap.moveEnemies();
+                            Player.checkDeath(currentMap);
                             break;
                         case VK_A:
                         case VK_LEFT:
                             currentMap = player.move(currentMap, W);
+                            currentMap.moveEnemies();
+                            Player.checkDeath(currentMap);
                             break;
                         case VK_M:
                             component.displayWorldMap();
