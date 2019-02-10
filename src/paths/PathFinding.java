@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public final class PathFinding {
 
-    public static Location getPath(Map map, Location start, Location end){
+    public static Location getPath(Map map, Location start, Location end) {
 
         PathGraph nodeList = new PathGraph();
 

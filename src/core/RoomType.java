@@ -1,2 +1,3 @@
 package core;
-public enum RoomType { Start, Treasure, Enemy, Hidden}
+
+public enum RoomType {Start, Treasure, Enemy, Hidden}

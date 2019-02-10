@@ -1,2 +1,3 @@
 package core;
-public enum Direction { N, S, E, W}
+
+public enum Direction {N, S, E, W}

@@ -29,7 +29,7 @@ public final class Player {
     }
 
     public static void checkDeath(Map map) {
-        if (map.getBlock(pos.getX(),pos.getY()) == 'e'){
+        if (map.getBlock(pos.getX(), pos.getY()) == 'e') {
             System.out.println("You got caught by a monster!!!");
             exit(0);
         }

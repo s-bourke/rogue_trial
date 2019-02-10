@@ -84,9 +84,10 @@ public class PosNode {
     }
 
     public Location getPos() {
-        return new Location(x,y);
+        return new Location(x, y);
     }
-    public void printEdges(){
+
+    public void printEdges() {
         for (PosNode edge : edges) {
             System.out.println(edge.getPos());
         }

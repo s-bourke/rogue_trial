@@ -34,10 +34,10 @@ public class PathGraph {
             if (getNode(node.getX(), node.getY() - 1) != null && !BlockRefs.worldBlocks.contains(String.valueOf(getNode(node.getX(), node.getY() - 1).getType()))) {
                 node.addEdge(getNode(node.getX(), node.getY() - 1));
             }
-            if (getNode(node.getX() + 1, node.getY()) != null && !BlockRefs.worldBlocks.contains(String.valueOf(getNode(node.getX()+1, node.getY()).getType()))) {
+            if (getNode(node.getX() + 1, node.getY()) != null && !BlockRefs.worldBlocks.contains(String.valueOf(getNode(node.getX() + 1, node.getY()).getType()))) {
                 node.addEdge(getNode(node.getX() + 1, node.getY()));
             }
-            if (getNode(node.getX() - 1, node.getY()) != null && !BlockRefs.worldBlocks.contains(String.valueOf(getNode(node.getX()-1, node.getY()).getType()))) {
+            if (getNode(node.getX() - 1, node.getY()) != null && !BlockRefs.worldBlocks.contains(String.valueOf(getNode(node.getX() - 1, node.getY()).getType()))) {
                 node.addEdge(getNode(node.getX() - 1, node.getY()));
             }
         }
@@ -83,7 +83,7 @@ public class PathGraph {
             path.add(currentNode.getPos());
             currentNode = currentNode.getPath();
         }
-        return path.get(path.size()-1);
+        return path.get(path.size() - 1);
     }
 
     private void findNextPath(PosNode currentNode, Location end) {
@@ -107,12 +107,12 @@ public class PathGraph {
             }
         }
 
-        if(nextList.size() == 0){
+        if (nextList.size() == 0) {
             nextList = futureList;
             futureList = new ArrayList<PosNode>();
         }
 
-        findNextPath(nextList.get((int)(Math.random()*nextList.size())), end);
+        findNextPath(nextList.get((int) (Math.random() * nextList.size())), end);
 
     }
 

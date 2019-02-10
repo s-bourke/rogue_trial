@@ -50,13 +50,13 @@ public final class MapGenerator {
         }
 
         if (Math.random() < 0.3) {
-            int x =(int)(Math.random() * (size-6))+3;
-            int y =(int)(Math.random() * (size-6))+3;
+            int x = (int) (Math.random() * (size - 6)) + 3;
+            int y = (int) (Math.random() * (size - 6)) + 3;
             System.out.println(x + " " + y);
-            nMap.addBlock(x,y, 'e');
+            nMap.addBlock(x, y, 'e');
         }
 
-            nMap.writeMap(getFileName(loc.getX(), loc.getY()));
+        nMap.writeMap(getFileName(loc.getX(), loc.getY()));
         return nMap;
     }
 
